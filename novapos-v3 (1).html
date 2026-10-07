@@ -1,0 +1,280 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><title>NovaPOS V3</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f6f2ea;--card:#fffdf9;--ink:#221e1a;--mut:#8a8074;--pri:#c8a45d;--pri2:#8f6a2a;--line:#e8dfcd;--ok:#3a8f6c;--warn:#c98a1f;--bad:#b8404f;--soft:#f3ead7;--nav:#1d1915;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16130f;--card:#201c17;--ink:#f3ecdf;--mut:#a89d8c;--line:#38312a;--soft:#2c261d;--pri2:#d9b877}}
+:root[data-theme="dark"]{--bg:#16130f;--card:#201c17;--ink:#f3ecdf;--mut:#a89d8c;--line:#38312a;--soft:#2c261d;--pri2:#d9b877}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,"Segoe UI",sans-serif}
+.top{height:4px;background:linear-gradient(90deg,#f6d5dd,#e9dcc0,#cfe3f3,#dccdf0,#f6d5dd)}
+#app{display:flex;min-height:100vh}nav{width:190px;background:var(--card);border-right:1px solid var(--line);padding:12px;flex-shrink:0}
+nav h1{font:700 20px Georgia,serif;margin:4px 6px 14px;color:var(--pri2)}nav small{display:block;color:var(--mut);font:12px system-ui}
+nav a{display:block;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--ink);margin-bottom:2px}nav a.on,nav a:hover{background:var(--soft);color:var(--pri2);font-weight:600}
+main{flex:1;padding:16px;min-width:0}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.grid{display:grid;gap:12px}.g4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.g2{grid-template-columns:1.5fr 1fr}
+.kpi b{display:block;font-size:20px;margin-top:2px}.kpi span{color:var(--mut);font-size:12px}
+button,.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 12px;cursor:pointer;font:inherit}
+button.p{background:linear-gradient(135deg,#d9a0b0,#b0687e);color:#fff;border:0;font-weight:600}button.big{padding:14px;font-size:16px;width:100%}button.d{color:var(--bad)}button.sm{padding:4px 9px;font-size:12px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+label{display:block;font-size:12px;color:var(--mut);margin:8px 0 3px}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-size:12px;font-weight:600}.sc{overflow-x:auto}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-height:62vh;overflow:auto}
+.pi{border:1px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;background:var(--card)}.pi:hover{border-color:var(--pri)}.pi.out{opacity:.45}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;background:var(--soft);color:var(--pri2)}.tag.bad{background:#fbe3e6;color:var(--bad)}.tag.ok{background:#dff3ea;color:var(--ok)}.tag.warn{background:#faefd5;color:var(--warn)}
+.bar{display:flex;align-items:flex-end;gap:6px;height:120px}.bar i{flex:1;background:linear-gradient(#dccdf0,#d9a0b0);border-radius:6px 6px 0 0;min-height:2px;position:relative}.bar i em{position:absolute;bottom:-18px;left:0;right:0;text-align:center;font:10px system-ui;color:var(--mut)}
+.ov{position:fixed;inset:0;background:#0006;display:flex;align-items:center;justify-content:center;z-index:50;padding:12px}.md{background:var(--card);border-radius:16px;padding:18px;width:min(520px,100%);max-height:90vh;overflow:auto}
+#mhint{position:fixed;z-index:99;background:var(--ink);color:var(--bg);padding:5px 10px;border-radius:8px;font-size:12px;pointer-events:none;max-width:90vw;display:none}
+#sst{position:fixed;left:8px;bottom:8px;z-index:40;font-size:11px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:3px 10px;color:var(--mut)}
+#toasts{position:fixed;right:12px;top:12px;z-index:99}.ts{background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:10px;margin-bottom:6px}.ts.ok{border-left:5px solid var(--ok)}.ts.bad{border-left:5px solid var(--bad)}.ts.warn{border-left:5px solid var(--warn)}
+#login{max-width:340px;margin:12vh auto;padding:16px}#printarea{display:none}.rc{font:12px monospace;color:#000;background:#fff;padding:6px;width:80mm}.rc.w58{width:58mm}.rc hr{border:0;border-top:1px dashed #000}.rc .r{display:flex;justify-content:space-between}
+@media print{body>*:not(#printarea){display:none!important}#printarea{display:block}}
+@media(max-width:800px){#app{flex-direction:column}nav{width:100%;display:flex;overflow-x:auto;gap:4px;padding:8px;border-right:0;border-bottom:1px solid var(--line)}nav h1,nav small{display:none}nav a{white-space:nowrap}.g2{grid-template-columns:1fr}main{padding:10px}}
+
+.top{background:linear-gradient(90deg,#8f6a2a,#e6cf9b,#c8a45d,#f1e2bd,#8f6a2a)}
+nav{background:var(--nav);border-right:0}nav h1{color:#e6cf9b;letter-spacing:.5px}nav small{color:#a89d8c}nav a{color:#d9d0c0;transition:background .2s,color .2s,transform .15s}nav a.on,nav a:hover{background:#2e2820;color:#e6cf9b}nav a:active{transform:scale(.97)}
+.card{box-shadow:0 1px 2px #0000000a,0 6px 18px -10px #00000026}
+button,.btn{transition:transform .15s ease,box-shadow .2s ease,background-color .2s,border-color .2s,filter .2s}
+button:hover{transform:translateY(-1px);box-shadow:0 5px 14px -4px #00000033;border-color:var(--pri)}button:active{transform:translateY(0) scale(.97);box-shadow:none}
+button.p{background:linear-gradient(135deg,#e2c887,#a47b33);color:#1d1915;border:0;font-weight:700;letter-spacing:.2px}button.p:hover{filter:brightness(1.07)}button.d:hover{background:#b8404f12;border-color:var(--bad)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+input,select,textarea{transition:border-color .2s,box-shadow .2s}input:focus,select:focus,textarea:focus{outline:0;border-color:var(--pri);box-shadow:0 0 0 3px #c8a45d33}
+.pi{transition:transform .15s,box-shadow .2s,border-color .2s}.pi:hover{transform:translateY(-2px);box-shadow:0 8px 18px -10px #00000040}.pi:active{transform:scale(.98)}
+.bar i{background:linear-gradient(#ecd9a6,#a47b33);transition:height .4s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}@keyframes sl{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+.ov{animation:fi .18s ease}.md{animation:pop .22s ease}.ts{animation:sl .25s ease}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body><div class="top"></div><div id="toasts"></div><div id="sst"></div><div id="root"></div><div id="printarea"></div>
+<script>
+const K='novapos_v1',$=s=>document.querySelector(s),fm=n=>(Math.round(n)||0).toLocaleString('vi-VN')+'đ',
+esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+dt=t=>new Date(t).toLocaleString('vi-VN'),N=v=>parseFloat(v)||0;
+function seed(){const P=(sku,name,brand,conc,ml,cost,price,stock)=>({id:uid()+sku,sku,barcode:'893'+sku.replace(/\D/g,'').padStart(9,'0'),name,brand,conc,ml,cost,price,sale:0,stock,min:3,desc:'',note:'',del:false});
+return{products:[P('DIOR001','Sauvage','Dior','EDP',100,2100000,2950000,12),P('CHAN001','Bleu de Chanel','Chanel','EDP',100,2600000,3600000,8),P('YSL001','Libre','YSL','EDP',50,1800000,2490000,10),P('LAN001','La Vie Est Belle','Lancôme','EDP',50,1700000,2350000,2),P('TF001','Tobacco Vanille','Tom Ford','Parfum',50,5200000,7200000,4),P('JM001','Wood Sage & Sea Salt','Jo Malone','EDT',30,1300000,1850000,0),P('GIV001','L\'Interdit','Givenchy','EDP',80,1900000,2650000,6)],
+customers:[],orders:[],log:[],exp:[],held:[],seq:0,
+users:[{u:'admin',p:'admin',n:'Quản trị',role:'admin'},{u:'quanly',p:'123',n:'Quản lý',role:'manager'},{u:'nv',p:'123',n:'Nhân viên A',role:'staff'}],
+set:{shop:'NovaPerfume',addr:'123 Nguyễn Huệ, Q.1, TP.HCM',phone:'0900000000',neg:false,pts:100000,w:'80'}}}
+let db={products:[],customers:[],orders:[],log:[],exp:[],held:[],users:[],set:{shop:'NovaPerfume',addr:'123 Nguyễn Huệ, Q.1, TP.HCM',phone:'0900000000',neg:false,pts:100000,w:'80'}},me=null,page='dash',pos=null;
+function save(){try{FB.push()}catch(e){toast('Không đồng bộ được dữ liệu','bad')}}
+function toast(m,t='ok',ms){const d=document.createElement('div');d.className='ts '+t;d.textContent=(t=='ok'?'✓ ':t=='warn'?'⚠ ':'✕ ')+m;$('#toasts').appendChild(d);setTimeout(()=>d.remove(),ms||3000);return true}
+const PERM={admin:['*'],manager:['DELETE_PRODUCT','EDIT_COST','VIEW_PROFIT','REFUND_ORDER','MANAGE'],staff:[]};
+const can=p=>PERM[me.role].includes('*')||PERM[me.role].includes(p);
+function modal(title,body,onSave,label='Lưu'){closeM();const o=document.createElement('div');o.className='ov';o.id='ov';o.innerHTML=`<div class="md"><h3 style="margin-top:0">${title}</h3>${body}<div class="row" style="margin-top:14px"><button onclick="closeM()">${onSave?'Hủy':'Đóng'}</button>${onSave?`<button class="p" id="mok">${label}</button>`:''}</div></div>`;document.body.appendChild(o);if(onSave)$('#mok').onclick=()=>{if(onSave()!==false)closeM()}}
+function closeM(){const o=$('#ov');if(o)o.remove()}
+const confirmBox=(m,fn,l='Xác nhận')=>modal('Xác nhận',`<p>${m}</p>`,fn,l);
+const fld=(l,id,v='',t='text',x='')=>`<label>${l}</label><input id="${id}" type="${t}" value="${esc(v)}" ${x}>`;
+const val=id=>$('#'+id).value.trim();
+const price=p=>p.sale>0?p.sale:p.price,live=()=>db.products.filter(p=>!p.del);
+
+/* ---------- LOGIN / SHELL ---------- */
+function loginView(){$('#root').innerHTML=`<div class="card" id="login"><h1 style="font:700 26px Georgia;color:var(--pri2);margin:0">NovaPOS</h1><p style="color:var(--mut)">V3 · Đồng bộ Firebase. Admin đăng nhập bằng email, nhân viên bằng tên đăng nhập.</p>${fld('Email hoặc tên đăng nhập','lu')}${fld('Mật khẩu','lp','','password')}<button class="p big" style="margin-top:12px" onclick="login()">Đăng nhập</button></div>`}
+async function login(){let e=val('lu'),p=$('#lp').value;if(!e||!p)return toast('Nhập tên đăng nhập và mật khẩu','bad');if(!e.includes('@'))e=e.toLowerCase()+'@novapos.local';
+try{await FB.signIn(e,p)}catch(x){toast(x.code=='auth/network-request-failed'?'Không có kết nối mạng':'Sai tên đăng nhập hoặc mật khẩu','bad')}}
+const NAV=[['dash','Tổng quan','VIEW_PROFIT'],['pos','Bán hàng'],['prod','Sản phẩm','MANAGE'],['inv','Kho','MANAGE'],['ord','Đơn hàng'],['cus','Khách hàng'],['exp','Chi phí','MANAGE'],['trash','Thùng rác','MANAGE'],['set','Cài đặt','MANAGE']];
+function shell(){const items=NAV.filter(n=>!n[2]||can(n[2]));if(!items.find(n=>n[0]==page))page='pos';
+$('#root').innerHTML=`<div id="app"><nav><h1>NovaPOS<small>${esc(me.n)} · ${me.role}</small></h1>${items.map(n=>`<a data-p="${n[0]}" onclick="go('${n[0]}')">${n[1]}</a>`).join('')}<a onclick="pwForm()">Đổi mật khẩu</a><a onclick="FB.signOut()" style="color:var(--bad)">Đăng xuất</a></nav><main id="main"></main></div>`;go(page)}
+function go(p){page=p;document.querySelectorAll('nav a[data-p]').forEach(a=>a.classList.toggle('on',a.dataset.p==p));({dash,pos:posView,prod,inv,ord,cus,exp,trash:trashV,set})[p]()}
+
+/* ---------- DASHBOARD ---------- */
+const live_orders=()=>db.orders.filter(o=>!['Đã hủy','Đã hoàn'].includes(o.status));
+function range(k){const n=new Date(),d=new Date(n.getFullYear(),n.getMonth(),n.getDate()),D=864e5;
+if(k=='today')return[+d,+d+D];if(k=='yest')return[+d-D,+d];if(k=='week')return[+d-((d.getDay()+6)%7)*D,+d+D];if(k=='month')return[+new Date(n.getFullYear(),n.getMonth(),1),+d+D];return[+new Date(n.getFullYear(),0,1),+d+D]}
+function stats(a,b){const os=live_orders().filter(o=>o.time>=a&&o.time<b),rev=os.reduce((s,o)=>s+o.total,0),cogs=os.reduce((s,o)=>s+o.items.reduce((x,i)=>x+i.cost*i.qty,0),0),ex=db.exp.filter(e=>e.time>=a&&e.time<b).reduce((s,e)=>s+e.amt,0);return{os,rev,cogs,gross:rev-cogs,ex,net:rev-cogs-ex}}
+function dash(){const pr=can('VIEW_PROFIT'),R=[['today','Hôm nay'],['yest','Hôm qua'],['week','Tuần này'],['month','Tháng này'],['year','Năm nay']].map(([k,l])=>[l,stats(...range(k))]),m=R[3][1],all=db.orders,
+low=live().filter(p=>p.stock>0&&p.stock<=p.min).length,out=live().filter(p=>p.stock<=0).length,val=live().reduce((s,p)=>s+Math.max(0,p.stock)*p.cost,0);
+const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);const a=+new Date(d.getFullYear(),d.getMonth(),d.getDate());return[d.getDate()+'/'+(d.getMonth()+1),stats(a,a+864e5).rev]}),mx=Math.max(1,...days.map(d=>d[1]));
+const tp={};live_orders().forEach(o=>o.items.forEach(i=>{const t=tp[i.id]||(tp[i.id]={n:i.name,q:0,r:0,p:0});t.q+=i.qty;t.r+=i.qty*i.price-i.disc;t.p+=i.qty*(i.price-i.cost)-i.disc}));
+const top=Object.values(tp).sort((a,b)=>b.q-a.q).slice(0,5);
+$('#main').innerHTML=`<div class="grid g4">${R.map(([l,s])=>`<div class="card kpi"><span>Doanh thu ${l}</span><b>${fm(s.rev)}</b></div>`).join('')}</div>
+${pr?`<div class="card"><b>Lợi nhuận tháng này</b><div class="grid g4" style="margin-top:8px">${[['Doanh thu',m.rev],['Giá vốn',m.cogs],['Lợi nhuận gộp',m.gross],['Chi phí',m.ex],['Lợi nhuận ròng',m.net]].map(x=>`<div class="kpi"><span>${x[0]}</span><b>${fm(x[1])}</b></div>`).join('')}</div></div>`:''}
+<div class="grid g4"><div class="card kpi"><span>Tổng đơn</span><b>${all.length}</b></div><div class="card kpi"><span>Hoàn thành</span><b>${all.filter(o=>o.status=='Hoàn thành').length}</b></div><div class="card kpi"><span>Đang giao</span><b>${all.filter(o=>o.status=='Đang giao').length}</b></div><div class="card kpi"><span>Đã hủy</span><b>${all.filter(o=>o.status=='Đã hủy').length}</b></div><div class="card kpi"><span>Đơn COD</span><b>${all.filter(o=>o.pay=='COD').length}</b></div></div>
+<div class="grid g4"><div class="card kpi"><span>Tổng sản phẩm</span><b>${live().length}</b></div><div class="card kpi"><span>Sắp hết</span><b style="color:var(--warn)">${low}</b></div><div class="card kpi"><span>Hết hàng</span><b style="color:var(--bad)">${out}</b></div>${pr?`<div class="card kpi"><span>Giá trị tồn kho</span><b>${fm(val)}</b></div>`:''}</div>
+<div class="grid g2"><div class="card"><b>Doanh thu 7 ngày</b><div class="bar" style="margin:12px 0 22px">${days.map(d=>`<i style="height:${d[1]/mx*100}%" title="${fm(d[1])}"><em>${d[0]}</em></i>`).join('')}</div></div>
+<div class="card"><b>Top bán chạy</b><div class="sc"><table><tr><th>SP</th><th>SL</th><th>DT</th>${pr?'<th>LN</th>':''}</tr>${top.map(t=>`<tr><td>${esc(t.n)}</td><td>${t.q}</td><td>${fm(t.r)}</td>${pr?`<td>${fm(t.p)}</td>`:''}</tr>`).join('')||'<tr><td colspan=4>Chưa có dữ liệu bán hàng</td></tr>'}</table></div></div></div>`}
+
+/* ---------- POS ---------- */
+const newPos=()=>({cart:[],dtype:'%',dval:0,ship:0,cust:'',pay:'Tiền mặt',recv:0,note:''});
+function calc(){const s=pos,sub=s.cart.reduce((a,l)=>a+l.qty*l.price-l.disc,0);let od=s.dtype=='%'?sub*s.dval/100:s.dval;od=Math.min(Math.max(od,0),sub);return{sub,od,total:sub-od+s.ship}}
+function posView(){pos=pos||newPos();const br=[...new Set(live().map(p=>p.brand))].sort();
+$('#main').innerHTML=`<div class="grid g2"><div class="card"><div class="row"><input id="q" placeholder="Tìm tên / SKU / mã vạch / thương hiệu (Enter để thêm theo mã)" oninput="posList()" onkeydown="if(event.key=='Enter')posEnter()" style="flex:3" autofocus><select id="fb" onchange="posList()"><option value="">Thương hiệu</option>${br.map(b=>`<option>${esc(b)}</option>`).join('')}</select><select id="fc" onchange="posList()"><option value="">Nồng độ</option>${['EDT','EDP','Parfum','Extrait'].map(b=>`<option>${b}</option>`).join('')}</select><select id="fs" onchange="posList()"><option value="">Tồn kho</option><option value="in">Còn hàng</option><option value="out">Hết hàng</option></select></div><div class="row" style="margin-top:6px"><input id="pmin" type="number" placeholder="Giá từ" oninput="posList()"><input id="pmax" type="number" placeholder="Giá đến" oninput="posList()"><input id="fml" type="number" placeholder="Dung tích (ml)" oninput="posList()"></div><div class="pg" id="plist" style="margin-top:10px"></div></div>
+<div><div class="card"><div class="row"><b style="flex:2">Giỏ hàng</b><button onclick="holdOrder()">Giữ đơn</button><button onclick="heldList()">Đơn giữ (${db.held.length})</button></div><div id="lines"></div></div>
+<div class="card">${fld('Giảm toàn đơn','dv',pos.dval,'number','oninput="pf()"').replace('<input','<div class="row"><input style="flex:2"')}<select id="dt" onchange="pf()" style="flex:1"><option>%</option><option>đ</option></select></div>
+${fld('Phí ship (0 = miễn phí)','sh',pos.ship,'number','oninput="pf()"')}<label>Khách hàng</label><div class="row"><select id="cu" onchange="pf()" style="flex:3"><option value="">Khách lẻ</option>${db.customers.filter(c=>!c.del).map(c=>`<option value="${c.id}">${esc(c.name)} · ${esc(c.phone)}</option>`).join('')}</select><button onclick="cusForm(null,true)">+ Mới</button></div>
+<label>Thanh toán</label><select id="pm" onchange="pf()">${['Tiền mặt','Chuyển khoản','COD','Thẻ'].map(x=>`<option>${x}</option>`).join('')}</select>${fld('Tiền khách đưa','rv',pos.recv||'','number','oninput="pf()"')}${fld('Ghi chú đơn','nt',pos.note,'text','oninput="pf()"')}
+<div style="margin:12px 0;font-size:15px" id="sum"></div><div class="row"><button class="d" onclick="posClear()">Hủy đơn</button><button class="p big" style="flex:3" onclick="checkout()">THANH TOÁN</button></div></div></div></div>`;
+$('#dt').value=pos.dtype;$('#cu').value=pos.cust;$('#pm').value=pos.pay;posList();posLines()}
+function pf(){pos.dval=N($('#dv').value);pos.dtype=$('#dt').value;pos.ship=N($('#sh').value);pos.cust=$('#cu').value;pos.pay=$('#pm').value;pos.recv=N($('#rv').value);pos.note=$('#nt').value;posSum()}
+function posSum(){const c=calc(),ch=pos.recv-c.total;$('#sum').innerHTML=`Tạm tính: ${fm(c.sub)}<br>Giảm: -${fm(c.od)} · Ship: ${fm(pos.ship)}<br><b style="font-size:20px">Tổng: ${fm(c.total)}</b>${pos.pay=='Tiền mặt'?`<br>Tiền thối: <b>${fm(Math.max(0,ch))}</b>${ch<0&&pos.recv?` <span class="tag bad">thiếu ${fm(-ch)}</span>`:''}`:''}`}
+function posList(){const q=($('#q').value||'').toLowerCase(),b=$('#fb').value,c=$('#fc').value,s=$('#fs').value,a=N($('#pmin').value),z=N($('#pmax').value),ml=N($('#fml').value);
+const r=live().filter(p=>(!q||[p.name,p.sku,p.barcode,p.brand].join(' ').toLowerCase().includes(q))&&(!b||p.brand==b)&&(!c||p.conc==c)&&(!s||(s=='in'?p.stock>0:p.stock<=0))&&(!a||price(p)>=a)&&(!z||price(p)<=z)&&(!ml||p.ml==ml)).slice(0,60);
+$('#plist').innerHTML=r.map(p=>`<div class="pi ${p.stock<=0&&!db.set.neg?'out':''}" onclick="addCart('${p.id}')"><b>${esc(p.name)}</b><div style="color:var(--mut);font-size:12px">${esc(p.brand)} · ${p.conc} · ${p.ml}ml<br>${esc(p.sku)}</div><div style="color:var(--pri2);font-weight:700">${fm(price(p))}</div><span class="tag ${p.stock<=0?'bad':p.stock<=p.min?'warn':'ok'}">Kho: ${p.stock}</span></div>`).join('')||'<p style="color:var(--mut)">Không tìm thấy sản phẩm</p>'}
+function posEnter(){const q=$('#q').value.trim().toLowerCase(),p=live().find(p=>p.barcode==q||p.sku.toLowerCase()==q);if(p){addCart(p.id);$('#q').value='';posList()}}
+function addCart(id){const p=db.products.find(x=>x.id==id),l=pos.cart.find(x=>x.id==id),n=(l?l.qty:0)+1;
+if(!db.set.neg&&n>p.stock)return toast(`"${p.name}" chỉ còn ${p.stock} trong kho`,'bad');
+if(l)l.qty=n;else pos.cart.push({id,name:p.name,sku:p.sku,price:price(p),cost:p.cost,qty:1,disc:0});posLines()}
+function qty(i,d){const l=pos.cart[i],p=db.products.find(x=>x.id==l.id),n=l.qty+d;if(n<1)return pos.cart.splice(i,1),posLines();if(!db.set.neg&&n>p.stock)return toast('Vượt quá tồn kho','bad');l.qty=n;posLines()}
+function lineDisc(i,v){const l=pos.cart[i];l.disc=Math.min(Math.max(N(v),0),l.qty*l.price);posLines()}
+function posLines(){$('#lines').innerHTML=pos.cart.map((l,i)=>`<div style="border-bottom:1px solid var(--line);padding:8px 0"><div class="row"><div style="flex:3"><b>${esc(l.name)}</b><br><small style="color:var(--mut)">${esc(l.sku)} · ${fm(l.price)}</small></div><button class="sm d" onclick="pos.cart.splice(${i},1);posLines()">✕</button></div><div class="row" style="margin-top:4px"><button onclick="qty(${i},-1)">−</button><b style="text-align:center">${l.qty}</b><button onclick="qty(${i},1)">+</button><input type="number" data-money placeholder="Giảm (đ)" value="${l.disc||''}" onchange="lineDisc(${i},this.value)"><b style="text-align:right">${fm(l.qty*l.price-l.disc)}</b></div></div>`).join('')||'<p style="color:var(--mut)">Giỏ hàng trống</p>';posSum()}
+function posClear(){if(!pos.cart.length)return;confirmBox('Hủy đơn hiện tại và xóa giỏ hàng?',()=>{pos=newPos();posView();toast('Đã hủy đơn')},'Hủy đơn')}
+function holdOrder(){if(!pos.cart.length)return toast('Giỏ hàng trống','bad');modal('Giữ đơn',fld('Tên đơn (VD: Bàn 1, Khách VIP)','hn'),()=>{const n=val('hn');if(!n)return toast('Nhập tên đơn','bad')&&false;db.held.push({id:uid(),name:n,t:Date.now(),s:pos});save();pos=newPos();posView();toast('Đã giữ đơn')})}
+function heldList(){modal('Đơn đang giữ',db.held.map(h=>`<div class="row" style="border-bottom:1px solid var(--line);padding:6px 0"><b style="flex:3">${esc(h.name)}<br><small>${h.s.cart.length} SP · ${dt(h.t)}</small></b><button class="sm" onclick="restoreHeld('${h.id}')">Khôi phục</button><button class="sm d" onclick="delHeld('${h.id}')">Xóa</button></div>`).join('')||'Chưa có đơn giữ')}
+function restoreHeld(id){const h=db.held.find(x=>x.id==id);if(pos.cart.length)return toast('Hãy giữ hoặc hủy đơn hiện tại trước','warn');pos=h.s;db.held=db.held.filter(x=>x.id!=id);save();closeM();posView();toast('Đã khôi phục đơn')}
+function delHeld(id){db.held=db.held.filter(x=>x.id!=id);save();heldList()}
+function checkout(){pf();const c=calc();if(!pos.cart.length)return toast('Giỏ hàng trống','bad');
+for(const l of pos.cart){const p=db.products.find(x=>x.id==l.id);if(!db.set.neg&&l.qty>p.stock)return toast(`"${p.name}" không đủ tồn kho`,'bad')}
+if(pos.pay=='Tiền mặt'&&pos.recv<c.total)return toast('Tiền khách đưa chưa đủ','bad');
+const cu=db.customers.find(x=>x.id==pos.cust),now=Date.now();
+const o={id:'DH'+new Date().toISOString().slice(2,10).replace(/-/g,'')+'-'+(Date.now().toString(36).slice(-5)+Math.random().toString(36).slice(2,4)).toUpperCase(),time:now,user:me.u,uname:me.n,cust:cu?cu.id:'',custName:cu?cu.name:'Khách lẻ',items:pos.cart.map(l=>({...l})),sub:c.sub,discO:c.od,ship:pos.ship,total:c.total,pay:pos.pay,recv:pos.pay=='Tiền mặt'?pos.recv:c.total,change:pos.pay=='Tiền mặt'?pos.recv-c.total:0,status:pos.pay=='COD'?'Đang giao':'Hoàn thành',note:pos.note,pts:0};
+o.items.forEach(l=>{const p=db.products.find(x=>x.id==l.id);p.stock-=l.qty;db.log.push({t:now,pid:p.id,name:p.name,qty:-l.qty,type:'Bán hàng',user:me.n,note:o.id});if(p.stock<=p.min&&p.stock>=0)toast(`${p.name} sắp hết (${p.stock})`,'warn')});
+if(cu){o.pts=Math.floor(c.total/db.set.pts);cu.orders=(cu.orders||0)+1;cu.spent=(cu.spent||0)+c.total;cu.last=now;cu.pts=(cu.pts||0)+o.pts}
+db.orders.unshift(o);save();pos=newPos();posView();toast('Thanh toán thành công · '+o.id);
+modal('Thanh toán thành công',`<p>Mã đơn <b>${o.id}</b> · ${fm(o.total)}</p><button onclick="rcpFile('${o.id}')">Tải hóa đơn (.html) để in</button><p style="color:var(--mut);font-size:12px">Nếu nút In không hiện hộp thoại in, hãy tải file này rồi mở bằng trình duyệt để in.</p>`,()=>{printOrder(o.id);return false},'In hóa đơn')}
+function rcpHTML(id){const o=db.orders.find(x=>x.id==id),s=db.set;return `<div class="rc w${s.w}"><div style="text-align:center"><b style="font-size:15px">${esc(s.shop)}</b><br>${esc(s.addr)}<br>ĐT: ${esc(s.phone)}</div><hr>Mã đơn: ${o.id}<br>${dt(o.time)}<br>NV: ${esc(o.uname)} · KH: ${esc(o.custName)}<hr>${o.items.map(i=>`${esc(i.name)}<div class="r"><span>${i.qty} x ${fm(i.price)}</span><span>${fm(i.qty*i.price-i.disc)}</span></div>${i.disc?`<div class="r"><span>Giảm</span><span>-${fm(i.disc)}</span></div>`:''}`).join('')}<hr><div class="r"><span>Tạm tính</span><span>${fm(o.sub)}</span></div><div class="r"><span>Giảm giá</span><span>-${fm(o.discO)}</span></div><div class="r"><span>Ship</span><span>${fm(o.ship)}</span></div><div class="r"><b>TỔNG</b><b>${fm(o.total)}</b></div><div class="r"><span>Thanh toán</span><span>${o.pay}</span></div>${o.pay=='Tiền mặt'?`<div class="r"><span>Khách đưa / Thối</span><span>${fm(o.recv)} / ${fm(o.change)}</span></div>`:''}<hr><div style="text-align:center">Cảm ơn quý khách!</div></div>`}
+function printOrder(id){$('#printarea').innerHTML=rcpHTML(id);setTimeout(()=>window.print(),100)}
+async function saveFile(name,data){try{const d=window.claude&&await claude.use('downloads');if(d){await d.save({filename:name,data});return toast('Đã lưu file '+name)}}catch(e){if(e&&e.code=='declined')return}
+const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data]));a.download=name;a.click();toast('Đã tạo file '+name)}
+function rcpFile(id){const css='body{margin:0}.rc{font:12px monospace;color:#000;background:#fff;padding:6px;width:80mm}.rc.w58{width:58mm}.rc hr{border:0;border-top:1px dashed #000}.rc .r{display:flex;justify-content:space-between}';
+saveFile('hoadon-'+id+'.html','<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+id+'</title><style>'+css+'</style></head><body>'+rcpHTML(id)+'<script>onload=function(){setTimeout(print,300)}<\/script></body></html>')}
+
+/* ---------- PRODUCTS ---------- */
+function prod(){$('#main').innerHTML=`<div class="card"><div class="row"><input id="pq" placeholder="Tìm sản phẩm..." oninput="prodList()" style="flex:3"><button class="p" onclick="prodForm()">+ Thêm sản phẩm</button></div><div class="sc" id="pt" style="margin-top:8px"></div></div>`;prodList()}
+function prodList(){const q=$('#pq').value.toLowerCase();$('#pt').innerHTML=`<table><tr><th>SKU</th><th>Tên</th><th>Loại</th><th>${can('EDIT_COST')?'Giá nhập':''}</th><th>Giá bán</th><th>Tồn</th><th></th></tr>${live().filter(p=>!q||[p.name,p.sku,p.barcode,p.brand].join(' ').toLowerCase().includes(q)).map(p=>`<tr><td>${esc(p.sku)}</td><td><b>${esc(p.name)}</b><br><small>${esc(p.brand)}</small></td><td>${p.conc} ${p.ml}ml</td><td>${can('EDIT_COST')?fm(p.cost):''}</td><td>${fm(price(p))}</td><td><span class="tag ${p.stock<=0?'bad':p.stock<=p.min?'warn':'ok'}">${p.stock}</span></td><td style="white-space:nowrap"><button class="sm" onclick="prodForm('${p.id}')">Sửa</button> <button class="sm" onclick="prodForm('${p.id}',true)">Nhân bản</button> ${can('DELETE_PRODUCT')?`<button class="sm d" onclick="prodDel('${p.id}')">Xóa</button>`:''}</td></tr>`).join('')}</table>`}
+function prodForm(id,clone){const p=id?db.products.find(x=>x.id==id):{name:'',sku:'',barcode:'',brand:'',conc:'EDP',ml:50,cost:0,price:0,sale:0,stock:0,min:3,desc:'',note:''},ed=id&&!clone,ce=can('EDIT_COST');
+modal(ed?'Sửa sản phẩm':clone?'Nhân bản sản phẩm':'Thêm sản phẩm',`${fld('Tên sản phẩm *','f_n',p.name)}<div class="row">${fld('SKU *','f_s',clone?'':p.sku)}${fld('Mã vạch','f_b',clone?'':p.barcode)}</div><div class="row">${fld('Thương hiệu','f_br',p.brand)}<div><label>Nồng độ</label><select id="f_c">${['EDT','EDP','Parfum','Extrait'].map(x=>`<option ${x==p.conc?'selected':''}>${x}</option>`).join('')}</select></div>${fld('Dung tích (ml)','f_m',p.ml,'number')}</div><div class="row">${fld('Giá nhập','f_co',p.cost,'number',ce?'':'disabled')}${fld('Giá bán','f_p',p.price,'number')}${fld('Giá KM','f_sa',p.sale,'number')}</div><div class="row">${fld('Tồn kho','f_st',p.stock,'number',ed?'disabled':'')}${fld('Tồn tối thiểu','f_mi',p.min,'number')}</div>${fld('Mô tả / ghi chú','f_d',p.desc)}`,()=>{
+const n=val('f_n'),s=val('f_s'),v={cost:N($('#f_co').value),price:N($('#f_p').value),sale:N($('#f_sa').value),stock:N($('#f_st').value),min:N($('#f_mi').value),ml:N($('#f_m').value)};
+if(!n)return toast('Vui lòng nhập tên sản phẩm','bad')&&false;if(!s)return toast('Vui lòng nhập SKU','bad')&&false;
+if(db.products.some(x=>!x.del&&x.sku.toLowerCase()==s.toLowerCase()&&(!ed||x.id!=id)))return toast('SKU đã tồn tại','bad')&&false;
+if(Object.values(v).some(x=>x<0)||(!db.set.neg&&v.stock<0))return toast('Giá và số lượng không được âm','bad')&&false;if(v.sale>v.price)return toast('Giá KM phải nhỏ hơn giá bán','bad')&&false;
+const d={name:n,sku:s,barcode:val('f_b'),brand:val('f_br'),conc:$('#f_c').value,desc:val('f_d'),...v};
+if(ed){if(!ce)delete d.cost;Object.assign(p,d,{stock:p.stock})}else{const np={id:uid(),note:'',del:false,...d};if(!ce)np.cost=0;db.products.push(np);if(np.stock)db.log.push({t:Date.now(),pid:np.id,name:np.name,qty:np.stock,type:'Tồn đầu',user:me.n,note:''})}
+save();prodList();toast(ed?'Đã cập nhật sản phẩm':'Đã thêm sản phẩm')})}
+function prodDel(id){const p=db.products.find(x=>x.id==id);confirmBox(`Bạn có chắc muốn xóa "${esc(p.name)}"? (xóa mềm, lịch sử đơn vẫn giữ)`,()=>{p.del=true;save();prodList();toast('Đã xóa sản phẩm')},'Xóa')}
+
+/* ---------- INVENTORY ---------- */
+function inv(){const L=live();$('#main').innerHTML=`<div class="card"><div class="row"><button class="p" onclick="invForm('in')">Nhập kho</button><button onclick="invForm('out')">Xuất kho</button><button onclick="invForm('adj')">Điều chỉnh / kiểm kho</button></div></div><div class="card"><b>Cảnh báo tồn</b><div class="sc"><table><tr><th>SP</th><th>Tồn</th><th>Tối thiểu</th><th></th></tr>${L.filter(p=>p.stock<=p.min).map(p=>`<tr><td>${esc(p.name)}</td><td>${p.stock}</td><td>${p.min}</td><td><span class="tag ${p.stock<=0?'bad':'warn'}">${p.stock<=0?'Hết hàng':'Sắp hết'}</span></td></tr>`).join('')||'<tr><td colspan=4>Tồn kho ổn định</td></tr>'}</table></div></div><div class="card"><b>Lịch sử kho</b><div class="sc"><table><tr><th>Thời gian</th><th>Sản phẩm</th><th>SL</th><th>Loại</th><th>NV</th><th>Ghi chú</th><th></th></tr>${db.log.map((l,i)=>({l,i})).slice(-60).reverse().map(({l,i})=>`<tr><td>${dt(l.t)}</td><td>${esc(l.name)}</td><td style="color:${l.qty<0?'var(--bad)':'var(--ok)'}">${l.qty>0?'+':''}${l.qty}</td><td>${l.type}</td><td>${esc(l.user)}</td><td>${esc(l.note)}</td><td>${can('EDIT_SETTINGS')?`<button class="sm d" onclick="logDel(${i})">Xóa</button>`:''}</td></tr>`).join('')}</table></div></div>`}
+function logDel(i){confirmBox('Xóa dòng lịch sử kho này? (không làm thay đổi số tồn hiện tại)',()=>{db.log.splice(i,1);save();inv();toast('Đã xóa dòng lịch sử')},'Xóa')}
+function invForm(m){const opts=live().map(p=>`<option value="${p.id}">${esc(p.name)} (${p.sku}) — tồn ${p.stock}</option>`).join('');
+modal({in:'Nhập kho',out:'Xuất kho',adj:'Điều chỉnh tồn'}[m],`<label>Sản phẩm</label><select id="i_p" onchange="$('#i_cur')&&($('#i_cur').value=db.products.find(x=>x.id==this.value).stock)">${opts}</select>`+(m=='adj'?`${fld('Tồn hệ thống','i_cur',live()[0]?.stock,'number','disabled')}${fld('Tồn thực tế','i_q','','number')}`:fld('Số lượng','i_q','','number'))+(m=='in'?fld('Giá nhập (/sp)','i_c','','number',can('EDIT_COST')?'':'disabled')+fld('Nhà cung cấp','i_s')+fld('Mã phiếu','i_code','PN'+Date.now().toString().slice(-6)):m=='out'?`<label>Lý do</label><select id="i_r"><option>Hủy</option><option>Hoàn hàng</option><option>Hỏng</option><option>Mất</option><option>Điều chỉnh</option></select>`:fld('Lý do','i_r','Kiểm kho'))+fld('Ghi chú','i_n'),()=>{
+const p=db.products.find(x=>x.id==$('#i_p').value),q=N($('#i_q').value);if(!p)return toast('Chưa chọn sản phẩm','bad')&&false;let d;
+if(m=='adj'){if($('#i_q').value==='')return toast('Nhập tồn thực tế','bad')&&false;if(q<0&&!db.set.neg)return toast('Tồn không được âm','bad')&&false;d=q-p.stock}else{if(q<=0)return toast('Số lượng phải lớn hơn 0','bad')&&false;d=m=='in'?q:-q;if(d<0&&!db.set.neg&&p.stock+d<0)return toast('Xuất vượt tồn kho','bad')&&false}
+if(m=='in'){const c=N($('#i_c').value);if(can('EDIT_COST')&&c>0)p.cost=Math.round((Math.max(p.stock,0)*p.cost+q*c)/(Math.max(p.stock,0)+q))}
+p.stock+=d;db.log.push({t:Date.now(),pid:p.id,name:p.name,qty:d,type:m=='in'?'Nhập kho':m=='out'?val('i_r'):'Điều chỉnh',user:me.n,note:(m=='in'?val('i_code')+' · '+val('i_s')+' · ':m=='adj'?val('i_r')+' · ':'')+val('i_n')});save();inv();toast('Đã cập nhật kho');if(p.stock<=p.min)toast(p.name+' sắp hết','warn')})}
+
+/* ---------- ORDERS ---------- */
+function ord(){$('#main').innerHTML=`<div class="card"><div class="row"><input id="oq" placeholder="Mã đơn / khách..." oninput="ordList()" style="flex:3"><select id="os" onchange="ordList()"><option value="">Mọi trạng thái</option>${['Chờ xử lý','Đã xác nhận','Đang giao','Hoàn thành','Đã hủy','Đã hoàn'].map(x=>`<option>${x}</option>`).join('')}</select></div><div class="sc" id="ot" style="margin-top:8px"></div></div>`;ordList()}
+function ordList(){const q=$('#oq').value.toLowerCase(),s=$('#os').value;$('#ot').innerHTML=`<table><tr><th>Mã</th><th>Ngày</th><th>Khách</th><th>NV</th><th>Tổng</th><th>TT</th><th>Trạng thái</th><th></th></tr>${db.orders.filter(o=>(me.role!='staff'||o.user==me.u)&&(!s||o.status==s)&&(!q||(o.id+o.custName).toLowerCase().includes(q))).slice(0,100).map(o=>`<tr><td>${o.id}</td><td>${dt(o.time)}</td><td>${esc(o.custName)}</td><td>${esc(o.uname)}</td><td>${fm(o.total)}</td><td>${o.pay}</td><td><span class="tag ${['Đã hủy','Đã hoàn'].includes(o.status)?'bad':o.status=='Hoàn thành'?'ok':'warn'}">${o.status}</span></td><td><button class="sm" onclick="ordView('${o.id}')">Xem</button>${can('EDIT_SETTINGS')?` <button class="sm d" onclick="ordDel('${o.id}')">Xóa</button>`:''}</td></tr>`).join('')}</table>`}
+function ordView(id){const o=db.orders.find(x=>x.id==id),done=['Đã hủy','Đã hoàn'].includes(o.status);
+modal('Đơn '+o.id,`<p>${dt(o.time)} · ${esc(o.uname)} · ${esc(o.custName)}<br>Trạng thái: <b>${o.status}</b> · ${o.pay}</p><table>${o.items.map(i=>`<tr><td>${esc(i.name)}</td><td>${i.qty} x ${fm(i.price)}</td><td>${fm(i.qty*i.price-i.disc)}</td></tr>`).join('')}</table><p>Giảm: ${fm(o.discO)} · Ship: ${fm(o.ship)}<br><b>Tổng: ${fm(o.total)}</b>${o.note?'<br>Ghi chú: '+esc(o.note):''}${o.reason?'<br>Lý do: '+esc(o.reason):''}</p>${!done?`<label>Đổi trạng thái</label><select id="ost" onchange="ordSt('${o.id}',this.value)">${['Chờ xử lý','Đã xác nhận','Đang giao','Hoàn thành'].map(x=>`<option ${x==o.status?'selected':''}>${x}</option>`).join('')}</select><div class="row" style="margin-top:8px"><button class="d" onclick="ordEnd('${o.id}','Đã hủy')">Hủy đơn</button>${can('REFUND_ORDER')?`<button class="d" onclick="ordEnd('${o.id}','Đã hoàn')">Hoàn hàng</button>`:''}</div>`:''}<div class="row" style="margin-top:8px"><button onclick="printOrder('${o.id}')">In lại / Xem trước</button><button onclick="rcpFile('${o.id}')">Tải hóa đơn (.html)</button>${can('EDIT_SETTINGS')?`<button class="d" onclick="ordDel('${o.id}')">Xóa đơn</button>`:''}</div>`)}
+function ordDel(id){if(!can('EDIT_SETTINGS'))return toast('Chỉ admin được xóa đơn','bad');const o=db.orders.find(x=>x.id==id),act=!['Đã hủy','Đã hoàn'].includes(o.status);
+confirmBox(act?`Đơn ${id} đang hoạt động. Xóa sẽ hoàn hàng về kho, trừ doanh thu rồi xóa đơn. Tiếp tục?`:'Xóa vĩnh viễn đơn này khỏi danh sách?',()=>{if(act){o.items.forEach(i=>{const p=db.products.find(x=>x.id==i.id);if(p){p.stock+=i.qty;db.log.push({t:Date.now(),pid:p.id,name:p.name,qty:i.qty,type:'Xóa đơn',user:me.n,note:o.id})}});const c=db.customers.find(x=>x.id==o.cust);if(c){c.orders--;c.spent-=o.total;c.pts=Math.max(0,(c.pts||0)-o.pts)}}
+db.orders=db.orders.filter(x=>x.id!=id);save();ordList();toast('Đã xóa đơn')},'Xóa')}
+function ordSt(id,s){db.orders.find(x=>x.id==id).status=s;save();ordList();toast('Đã cập nhật trạng thái')}
+function ordEnd(id,st){modal(st=='Đã hủy'?'Hủy đơn':'Hoàn hàng',`<p>Hàng sẽ được nhập lại kho, doanh thu được trừ.</p>${fld('Lý do *','e_r')}`,()=>{const r=val('e_r');if(!r)return toast('Vui lòng nhập lý do','bad')&&false;const o=db.orders.find(x=>x.id==id);
+o.items.forEach(i=>{const p=db.products.find(x=>x.id==i.id);if(p){p.stock+=i.qty;db.log.push({t:Date.now(),pid:p.id,name:p.name,qty:i.qty,type:st=='Đã hủy'?'Hủy đơn':'Hoàn hàng',user:me.n,note:o.id+' · '+r})}});
+const c=db.customers.find(x=>x.id==o.cust);if(c){c.orders--;c.spent-=o.total;c.pts=Math.max(0,(c.pts||0)-o.pts)}
+o.status=st;o.reason=r;o.handler=me.n;save();ordList();toast(st=='Đã hủy'?'Đã hủy đơn':'Đã hoàn hàng')})}
+
+/* ---------- CUSTOMERS ---------- */
+const tier=s=>s>=5e7?'Platinum':s>=2e7?'Gold':s>=5e6?'Silver':'Thường';
+function cus(){$('#main').innerHTML=`<div class="card"><div class="row"><input id="cq" placeholder="Tìm tên / SĐT..." oninput="cusList()" style="flex:3"><button class="p" onclick="cusForm()">+ Thêm khách</button></div><div class="sc" id="ct" style="margin-top:8px"></div></div>`;cusList()}
+function cusList(){const q=$('#cq').value.toLowerCase();$('#ct').innerHTML=`<table><tr><th>Tên</th><th>SĐT</th><th>Hạng</th><th>Số đơn</th><th>Tổng mua</th><th>Điểm</th><th>Gần nhất</th><th></th></tr>${db.customers.filter(c=>!c.del&&(!q||(c.name+c.phone).toLowerCase().includes(q))).map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td><span class="tag">${tier(c.spent||0)}</span></td><td>${c.orders||0}</td><td>${fm(c.spent||0)}</td><td>${c.pts||0}</td><td>${c.last?dt(c.last):'-'}</td><td><button class="sm" onclick="cusForm('${c.id}')">Sửa</button> <button class="sm" onclick="cusHist('${c.id}')">Lịch sử</button> ${can('MANAGE')?`<button class="sm d" onclick="cusDel('${c.id}')">Xóa</button>`:''}</td></tr>`).join('')||'<tr><td colspan=8>Chưa có khách hàng</td></tr>'}</table>`}
+function cusForm(id,fromPos){const c=id?db.customers.find(x=>x.id==id):{name:'',phone:'',addr:'',note:''};modal(id?'Sửa khách hàng':'Thêm khách hàng',fld('Tên *','c_n',c.name)+fld('Số điện thoại *','c_p',c.phone,'tel')+fld('Địa chỉ','c_a',c.addr)+fld('Ghi chú','c_t',c.note),()=>{
+const n=val('c_n'),p=val('c_p').replace(/\s/g,'');if(!n)return toast('Vui lòng nhập tên khách','bad')&&false;if(!/^(0|\+84)\d{9,10}$/.test(p))return toast('Số điện thoại không đúng định dạng','bad')&&false;
+if(db.customers.some(x=>!x.del&&x.phone==p&&x.id!=id))return toast('Số điện thoại đã tồn tại','bad')&&false;
+if(id)Object.assign(c,{name:n,phone:p,addr:val('c_a'),note:val('c_t')});else{pf&&pos&&0;db.customers.push({id:uid(),name:n,phone:p,addr:val('c_a'),note:val('c_t'),orders:0,spent:0,pts:0,del:false})}
+save();toast(id?'Đã cập nhật khách hàng':'Đã thêm khách hàng');if(fromPos){const keep=pos;posView();pos=keep}else cusList()})}
+function cusDel(id){if(!can('MANAGE'))return toast('Bạn không có quyền xóa khách hàng','bad');const c=db.customers.find(x=>x.id==id);confirmBox(`Bạn có chắc muốn xóa khách "${esc(c.name)}"? (lịch sử đơn vẫn được giữ)`,()=>{c.del=true;save();cusList();toast('Đã xóa khách hàng')},'Xóa')}
+function cusHist(id){const c=db.customers.find(x=>x.id==id),os=db.orders.filter(o=>o.cust==id),f={};os.filter(o=>o.status!='Đã hủy'&&o.status!='Đã hoàn').forEach(o=>o.items.forEach(i=>f[i.name]=(f[i.name]||0)+i.qty));
+modal('Lịch sử: '+esc(c.name),`<p>Thường mua: ${Object.entries(f).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0]+' ('+x[1]+')').join(', ')||'—'}</p><table>${os.map(o=>`<tr><td>${o.id}</td><td>${fm(o.total)}</td><td>${o.status}</td></tr>`).join('')||'<tr><td>Chưa có đơn</td></tr>'}</table>`)}
+
+/* ---------- EXPENSES ---------- */
+function exp(){$('#main').innerHTML=`<div class="card"><button class="p" onclick="expForm()">+ Thêm chi phí</button><div class="sc" style="margin-top:8px"><table><tr><th>Ngày</th><th>Loại</th><th>Số tiền</th><th>Người tạo</th><th>Ghi chú</th><th></th></tr>${db.exp.slice().reverse().map(e=>`<tr><td>${dt(e.time)}</td><td>${e.type}</td><td>${fm(e.amt)}</td><td>${esc(e.user)}</td><td>${esc(e.note)}</td><td><button class="sm d" onclick="expDel(${e.time})">Xóa</button></td></tr>`).join('')}</table></div></div>`}
+function expDel(t){confirmBox('Bạn có chắc muốn xóa khoản chi phí này?',()=>{db.exp=db.exp.filter(e=>e.time!=t);save();exp();toast('Đã xóa chi phí')},'Xóa')}
+function expForm(){modal('Thêm chi phí',`<label>Loại</label><select id="x_t">${['Tiền điện','Tiền thuê','Quảng cáo','Tiền ship','Chi phí khác'].map(x=>`<option>${x}</option>`).join('')}</select>${fld('Số tiền','x_a','','number')}${fld('Ghi chú','x_n')}`,()=>{const a=N($('#x_a').value);if(a<=0)return toast('Số tiền phải lớn hơn 0','bad')&&false;db.exp.push({time:Date.now(),type:$('#x_t').value,amt:a,user:me.n,note:val('x_n')});save();exp();toast('Đã lưu chi phí')})}
+
+/* ---------- SETTINGS / BACKUP ---------- */
+function set(){const s=db.set;if(!can('EDIT_SETTINGS'))return $('#main').innerHTML='<div class="card">Bạn không có quyền sửa cài đặt.</div>';
+$('#main').innerHTML=`<div class="card"><b>Thông tin shop & hóa đơn</b>${fld('Tên shop','s_n',s.shop)}${fld('Địa chỉ','s_a',s.addr)}${fld('Điện thoại','s_p',s.phone)}${fld('Số tiền chi tiêu cho 1 điểm (đ)','s_pt',s.pts,'number')}<label>Khổ in</label><select id="s_w"><option value="58">58mm</option><option value="80">80mm</option></select><label><input type="checkbox" id="s_ng" style="width:auto" ${s.neg?'checked':''}> Cho phép bán âm kho</label><button class="p" style="margin-top:10px" onclick="setSave()">Lưu cài đặt</button></div>
+<div class="card"><b>Sao lưu / Khôi phục</b><div class="row" style="margin-top:8px"><button onclick="backup()">Xuất JSON</button><button onclick="$('#rf').click()">Khôi phục...</button><button class="d" onclick="confirmBox('Xóa TOÀN BỘ dữ liệu và về dữ liệu mẫu?',()=>{const s=seed();['products','customers','orders','log','exp','held'].forEach(k=>{db[k]=s[k]});save();set();toast('Đã đặt lại dữ liệu')},'Đặt lại')">Đặt lại</button></div><input type="file" id="rf" accept=".json" hidden onchange="restore(this.files[0])"></div>
+<div class="card"><div class="row"><b style="flex:3">Tài khoản & mật khẩu</b><button class="p" onclick="userForm()">+ Thêm nhân viên</button></div><div class="sc"><table><tr><th>Tên</th><th>Đăng nhập</th><th>SĐT</th><th>Vai trò</th><th></th></tr>${db.users.map(u=>`<tr><td>${esc(u.n)}</td><td>${esc(u.u)}</td><td>${esc(u.phone||'')}</td><td>${{admin:'Admin',manager:'Quản lý',staff:'Nhân viên bán hàng'}[u.role]}</td><td style="white-space:nowrap">${u.role!='admin'?`<button class="sm d" onclick="userDel('${u.id}')">Xóa</button>`:''}</td></tr>`).join('')}</table></div></div>
+<div class="card"><b style="color:var(--bad)">Dọn dữ liệu (chỉ admin)</b><div class="row" style="margin-top:8px"><button class="d" onclick="wipe('held')">Xóa đơn đang giữ</button><button class="d" onclick="wipe('log')">Xóa lịch sử kho</button><button class="d" onclick="wipe('exp')">Xóa chi phí</button><button class="d" onclick="wipe('orders')">Xóa tất cả đơn hàng</button></div></div>
+<div class="card" style="color:var(--mut)">Trạng thái: V3 — dữ liệu đồng bộ qua Firebase (Firestore), mật khẩu do Firebase quản lý. SPX / QR / công nợ NCC chưa có.</div>`;$('#s_w').value=s.w}
+function userForm(){if(!can('EDIT_SETTINGS'))return toast('Chỉ admin được thêm nhân viên','bad');
+modal('Thêm nhân viên',fld('Họ tên *','u_n')+fld('Tên đăng nhập *','u_u')+fld('Số điện thoại','u_ph','','tel')+`<label>Vai trò *</label><select id="u_r"><option value="staff">Nhân viên bán hàng</option><option value="manager">Quản lý</option></select>`+fld('Mật khẩu * (tối thiểu 6 ký tự)','u_p1','','password')+fld('Nhập lại mật khẩu *','u_p2','','password'),()=>{
+const n=val('u_n'),u=val('u_u').toLowerCase(),ph=val('u_ph').replace(/\s/g,''),a=$('#u_p1').value;
+if(!n)return toast('Vui lòng nhập họ tên','bad')&&false;if(!/^[a-z0-9_.]{3,}$/.test(u))return toast('Tên đăng nhập tối thiểu 3 ký tự, chỉ gồm chữ thường, số, _ hoặc .','bad')&&false;
+if(db.users.some(x=>x.u==u))return toast('Tên đăng nhập đã tồn tại','bad')&&false;if(ph&&!/^(0|\+84)\d{9,10}$/.test(ph))return toast('Số điện thoại không đúng định dạng','bad')&&false;
+if(a.length<6)return toast('Mật khẩu tối thiểu 6 ký tự','bad')&&false;if(a!==$('#u_p2').value)return toast('Hai mật khẩu không khớp','bad')&&false;
+FB.createStaff(u+'@novapos.local',a,{u,n,phone:ph,role:$('#u_r').value}).then(()=>toast('Đã thêm nhân viên '+n)).catch(e=>toast(e.code=='auth/email-already-in-use'?'Tên đăng nhập này đã từng được dùng, hãy chọn tên khác':'Không tạo được tài khoản: '+(e.code||e.message),'bad'))},'Thêm')}
+function userDel(id){const u=db.users.find(x=>x.id==id);if(!u||u.role=='admin'||u.id==me.id)return toast('Không thể xóa tài khoản này','bad');confirmBox(`Xóa tài khoản "${esc(u.n)}"? Người này sẽ không đăng nhập được nữa. Đơn đã bán vẫn được giữ.`,()=>{FB.delUser(id).then(()=>toast('Đã xóa tài khoản')).catch(()=>toast('Không xóa được tài khoản','bad'))},'Xóa')}
+function pwForm(){modal('Đổi mật khẩu của tôi',fld('Mật khẩu hiện tại','pw0','','password')+fld('Mật khẩu mới (tối thiểu 6 ký tự)','pw1','','password')+fld('Nhập lại mật khẩu mới','pw2','','password'),()=>{const c=$('#pw0').value,a=$('#pw1').value;
+if(!c)return toast('Nhập mật khẩu hiện tại','bad')&&false;if(a.length<6)return toast('Mật khẩu mới tối thiểu 6 ký tự','bad')&&false;if(a!==$('#pw2').value)return toast('Hai mật khẩu không khớp','bad')&&false;
+FB.changePw(c,a).then(()=>toast('Đã đổi mật khẩu')).catch(()=>toast('Mật khẩu hiện tại không đúng','bad'))},'Đổi mật khẩu')}
+function trashV(){const row=(k,x,l)=>`<tr><td>${esc(l)}</td><td style="white-space:nowrap"><button class="sm" onclick="restoreItem('${k}','${x.id}')">Khôi phục</button> ${can('EDIT_SETTINGS')?`<button class="sm d" onclick="purge('${k}','${x.id}')">Xóa vĩnh viễn</button>`:''}</td></tr>`,
+P=db.products.filter(p=>p.del),C=db.customers.filter(c=>c.del);
+$('#main').innerHTML=`<div class="card"><b>Sản phẩm đã xóa</b><div class="sc"><table>${P.map(p=>row('products',p,p.sku+' · '+p.name)).join('')||'<tr><td>Không có</td></tr>'}</table></div></div><div class="card"><b>Khách hàng đã xóa</b><div class="sc"><table>${C.map(c=>row('customers',c,c.name+' · '+c.phone)).join('')||'<tr><td>Không có</td></tr>'}</table></div></div><p style="color:var(--mut)">Mục đã xóa vẫn được giữ ở đây. Khôi phục để dùng lại, hoặc (admin) xóa vĩnh viễn.</p>`}
+function restoreItem(k,id){const x=db[k].find(i=>i.id==id);if(k=='products'&&db.products.some(p=>!p.del&&p.sku.toLowerCase()==x.sku.toLowerCase()))return toast('Không khôi phục được: SKU đang được dùng','bad');
+if(k=='customers'&&db.customers.some(c=>!c.del&&c.phone==x.phone))return toast('Không khôi phục được: số điện thoại đang được dùng','bad');x.del=false;save();trashV();toast('Đã khôi phục')}
+function purge(k,id){if(!can('EDIT_SETTINGS'))return toast('Chỉ admin được xóa vĩnh viễn','bad');confirmBox('Xóa vĩnh viễn mục này? Không thể hoàn tác (đơn đã bán vẫn giữ nguyên thông tin).',()=>{db[k]=db[k].filter(i=>i.id!=id);save();trashV();toast('Đã xóa vĩnh viễn')},'Xóa vĩnh viễn')}
+function wipe(k){if(!can('EDIT_SETTINGS'))return toast('Chỉ admin được thực hiện','bad');const L={held:'tất cả đơn đang giữ',log:'toàn bộ lịch sử kho',exp:'toàn bộ chi phí',orders:'TẤT CẢ đơn hàng (không hoàn kho, doanh thu về 0, thống kê khách về 0)'};
+confirmBox(`Bạn có chắc muốn xóa ${L[k]}? Nên xuất JSON sao lưu trước. Không thể hoàn tác.`,()=>{db[k]=[];if(k=='orders')db.customers.forEach(c=>{c.orders=0;c.spent=0;c.pts=0;c.last=0});save();set();toast('Đã xóa dữ liệu')},'Xóa hết')}
+function setSave(){const pt=N($('#s_pt').value);if(!val('s_n'))return toast('Nhập tên shop','bad');if(pt<=0)return toast('Giá trị điểm phải lớn hơn 0','bad');Object.assign(db.set,{shop:val('s_n'),addr:val('s_a'),phone:val('s_p'),pts:pt,w:$('#s_w').value,neg:$('#s_ng').checked});save();toast('Đã lưu cài đặt')}
+function backup(){saveFile('novapos-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({...db,users:[]}))}
+function restore(f){if(!f)return;const r=new FileReader();r.onload=()=>{let d;try{d=JSON.parse(r.result);if(!d.products||!d.orders)throw 0}catch(e){return toast('File sao lưu không hợp lệ','bad')}confirmBox('Restore sẽ thay thế dữ liệu hiện tại.',()=>{['products','customers','orders','log','exp','held'].forEach(k=>{db[k]=d[k]||[]});if(d.set)Object.assign(db.set,d.set);save();set();toast('Đã khôi phục dữ liệu')},'Khôi phục')};r.readAsText(f)}
+const DG=['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
+function r3(n,full){const t=Math.floor(n/100),c=Math.floor(n%100/10),u=n%10;let s=(full||t>0)?DG[t]+' trăm':'';
+if(c>1)s+=' '+DG[c]+' mươi'+(u==1?' mốt':u==5?' lăm':u?' '+DG[u]:'');else if(c==1)s+=' mười'+(u==5?' lăm':u?' '+DG[u]:'');else if(u)s+=((full||t>0)?' lẻ ':' ')+DG[u];return s.trim()}
+function vi(n){n=Math.floor(n);if(n<=0)return'không đồng';const U=['',' nghìn',' triệu',' tỷ'],g=[];while(n>0&&g.length<4){g.push(n%1000);n=Math.floor(n/1000)}
+let s='';for(let i=g.length-1;i>=0;i--){if(g[i])s+=' '+r3(g[i],i<g.length-1)+U[i]}s=s.trim()+' đồng';return s[0].toUpperCase()+s.slice(1)}
+const MONEY=['sh','rv','f_co','f_p','f_sa','i_c','x_a','s_pt','dv'];
+(()=>{const h=document.createElement('div');h.id='mhint';document.body.appendChild(h);
+const show=e=>{const t=e.target;if(!t||!t.tagName||t.tagName!='INPUT'||!(t.dataset.money!==undefined||MONEY.includes(t.id)))return;const n=N(t.value);
+if(!n||(t.id=='dv'&&$('#dt')&&$('#dt').value=='%'))return h.style.display='none';const r=t.getBoundingClientRect();h.textContent=fm(n)+' — '+vi(n);h.style.left=Math.max(4,r.left)+'px';h.style.top=(r.bottom+4)+'px';h.style.display='block'};
+document.addEventListener('input',show);document.addEventListener('focusin',show);document.addEventListener('focusout',()=>h.style.display='none');document.addEventListener('scroll',()=>h.style.display='none',true)})();
+PERM.admin=['*'];PERM.admin.push('EDIT_SETTINGS');PERM.manager.push('MANAGE');
+window.getDB=()=>db;window.sst=(t,c)=>{const e=$('#sst');if(e){e.textContent=t?'● '+t:'';e.style.color=c||''}};
+window.onSignedIn=u=>{me=u;$('#root').innerHTML='<div class="card" style="max-width:320px;margin:20vh auto;text-align:center">Đang tải dữ liệu…</div>'};
+window.onLoaded=()=>{if(me){shell();sst('Đã đồng bộ','var(--ok)')}};
+window.onRemote=()=>{if(!me||$('#ov'))return;if(page=='pos')posList();else go(page)};
+window.onSignedOut=()=>{me=null;['products','customers','orders','log','exp','held','users'].forEach(k=>db[k].length=0);pos=null;sst('');loginView()};
+document.addEventListener('keydown',e=>{if(e.key=='Enter'&&$('#login'))login()});
+$('#root').innerHTML='<div class="card" style="max-width:320px;margin:20vh auto;text-align:center">Đang kết nối Firebase…</div>';
+setTimeout(()=>{if(!window.FB&&!me)$('#root').innerHTML='<div class="card" style="max-width:340px;margin:15vh auto">Không tải được Firebase. Kiểm tra mạng rồi tải lại trang.</div>'},10000);
+</script>
+<script type="module">
+import{initializeApp,deleteApp}from"https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import{getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,createUserWithEmailAndPassword,updatePassword,reauthenticateWithCredential,EmailAuthProvider}from"https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import{initializeFirestore,persistentLocalCache,persistentMultipleTabManager,doc,getDoc,setDoc,deleteDoc,collection,onSnapshot,writeBatch}from"https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyBM8tSMrPZmcETmcTL4BrrkNaC1fhhXi5Q",authDomain:"zhan-8a3e3.firebaseapp.com",projectId:"zhan-8a3e3",storageBucket:"zhan-8a3e3.firebasestorage.app",messagingSenderId:"386073736001",appId:"1:386073736001:web:0019f2aef03c5911b4a7c0"};
+const app=initializeApp(cfg),auth=getAuth(app),fs=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})});
+const D=()=>window.getDB(),T=(m,t,ms)=>window.toast(m,t,ms),COLS=['products','customers','orders','log','exp','held'];
+const SORT={products:(a,b)=>(a.name||'').localeCompare(b.name||''),customers:(a,b)=>(a.name||'').localeCompare(b.name||''),orders:(a,b)=>b.time-a.time,log:(a,b)=>a.t-b.t,exp:(a,b)=>a.time-b.time,held:(a,b)=>a.t-b.t,users:(a,b)=>(a.n||'').localeCompare(b.n||'')};
+let unsubs=[],last={},lastSet='',loaded=0,need=0,pend=0;
+const merge=(arr,docs)=>{const m=new Map(arr.map(x=>[x.id,x])),out=docs.map(d=>{const o=m.get(d.id);if(o){for(const k in o)delete o[k];Object.assign(o,d);return o}return d});arr.length=0;arr.push(...out)};
+const stop=()=>{unsubs.forEach(u=>u());unsubs=[];last={};lastSet='';loaded=0;need=0};
+function sub(ref,cb){need++;let first=true;const fin=()=>{if(first){first=false;loaded++;if(loaded==need)window.onLoaded()}};
+unsubs.push(onSnapshot(ref,s=>{cb(s);if(first)fin();else if(!s.metadata.hasPendingWrites&&(!s.docChanges||s.docChanges().length))window.onRemote()},e=>{console.error(e);window.sst('Lỗi đồng bộ','var(--bad)');T('Lỗi đồng bộ: '+e.code,'bad',15000);fin()}))}
+function listen(role){stop();const d=D();
+COLS.filter(c=>c!='exp'||role!='staff').forEach(c=>sub(collection(fs,c),s=>{merge(d[c],s.docs.map(x=>({...x.data(),id:x.id})).sort(SORT[c]));last[c]=new Map(d[c].map(o=>[o.id,JSON.stringify(o)]))}));
+sub(doc(fs,'cfg','set'),s=>{if(s.exists())Object.assign(d.set,s.data());lastSet=JSON.stringify(d.set)});
+if(role=='admin')sub(collection(fs,'users'),s=>merge(d.users,s.docs.map(x=>({...x.data(),id:x.id})).sort(SORT.users)))}
+window.FB={
+signIn:(e,p)=>signInWithEmailAndPassword(auth,e,p),signOut:()=>signOut(auth),delUser:id=>deleteDoc(doc(fs,'users',id)),
+async changePw(cur,np){const u=auth.currentUser;await reauthenticateWithCredential(u,EmailAuthProvider.credential(u.email,cur));await updatePassword(u,np)},
+async createStaff(email,pass,prof){const a2=initializeApp(cfg,'sec'+Date.now());try{const c=await createUserWithEmailAndPassword(getAuth(a2),email,pass);await setDoc(doc(fs,'users',c.user.uid),{...prof,email,active:true});await signOut(getAuth(a2))}finally{await deleteApp(a2)}},
+push(){const d=D(),b=[];
+for(const c of COLS){const L=last[c]||(last[c]=new Map()),cur=new Set();
+for(const it of d[c]){if(!it.id)it.id=window.uid();cur.add(it.id);const s=JSON.stringify(it);if(L.get(it.id)!==s){L.set(it.id,s);b.push([1,c,it.id,JSON.parse(s)])}}
+for(const id of [...L.keys()])if(!cur.has(id)){L.delete(id);b.push([0,c,id])}}
+const s=JSON.stringify(d.set);if(s!==lastSet){lastSet=s;b.push([1,'cfg','set',JSON.parse(s)])}
+for(let i=0;i<b.length;i+=400){const w=writeBatch(fs);b.slice(i,i+400).forEach(x=>x[0]?w.set(doc(fs,x[1],x[2]),x[3]):w.delete(doc(fs,x[1],x[2])));
+pend++;window.sst('Đang lưu…','var(--warn)');w.commit().then(()=>{if(--pend<=0)window.sst('Đã lưu lên Firebase','var(--ok)')}).catch(e=>{pend--;console.error(e);window.sst('LỖI LƯU DỮ LIỆU','var(--bad)');T((e.code=='permission-denied'?'Bạn không có quyền thực hiện thao tác này':'Không đồng bộ được: '+(e.code||e.message)),'bad',15000)})}}};
+onAuthStateChanged(auth,async user=>{
+if(!user){stop();window.onSignedOut();return}
+try{let snap=await getDoc(doc(fs,'users',user.uid));
+if(!snap.exists()){const b=await getDoc(doc(fs,'meta','bootstrap'));
+if(b.exists()){await signOut(auth);T('Tài khoản chưa được cấp quyền. Hãy nhờ admin thêm bạn.','bad');return}
+const w=writeBatch(fs);w.set(doc(fs,'users',user.uid),{u:(user.email||'').split('@')[0],n:'Quản trị',phone:'',role:'admin',active:true,email:user.email});w.set(doc(fs,'meta','bootstrap'),{by:user.uid,t:Date.now()});await w.commit();snap=await getDoc(doc(fs,'users',user.uid))}
+const p=snap.data();if(p.active===false){await signOut(auth);T('Tài khoản đã bị vô hiệu hóa','bad');return}
+window.onSignedIn({id:user.uid,u:p.u,n:p.n,role:p.role});listen(p.role)
+}catch(e){await signOut(auth);T('Không đăng nhập được: '+(e.code||e.message),'bad')}});
+</script></body></html>
